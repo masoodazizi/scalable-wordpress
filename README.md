@@ -1,2 +1,3 @@
-# scalable-wordpress
-Deploy a highly-available and fault-tolerance WordPress application on AWS via Terraform
+# Scalable WordPress Application with AWS
+## Introduction
+The purpose of this project is deploying a highly-available and fault-tolerance WordPress application in the AWS environment.
