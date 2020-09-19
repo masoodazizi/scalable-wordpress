@@ -9,12 +9,8 @@ variable "project_name" {
   default = "scwp"
 }
 
-variable "ssh_key_path" {
+variable "ssh_key_file" {
   default = "../environments/dev/.secrets/ssh-key"
-}
-
-variable "create_sshkey" {
-  default = 0
 }
 
 resource "random_string" "random_number" {
@@ -51,15 +47,14 @@ resource "aws_dynamodb_table" "terraform_locks" {
 }
 
 resource "null_resource" "key_gen" {
-  count = var.create_sshkey ? 1 : 0
   provisioner "local-exec" {
-    command     = "ssh-keygen -b 2048 -t rsa -f '${var.ssh_key_path}' -q -N '' -C 'ssh key for ${var.env} env'"
+    command     = "ssh-keygen -b 2048 -t rsa -f '${var.ssh_key_file}' -q -N '' -C 'ssh key for ${var.env} env'"
     interpreter = ["/bin/bash", "-c"]
   }
 }
 
 data "local_file" "ssh_public_key" {
-  filename = "${var.ssh_key_path}.pub"
+  filename = "${var.ssh_key_file}.pub"
 
   depends_on = [null_resource.key_gen]
 }
