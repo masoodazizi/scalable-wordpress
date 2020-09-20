@@ -1,4 +1,4 @@
-stage = "dev"
+env = "dev"
 
 region = "eu-central-1"
 
@@ -9,3 +9,7 @@ create_vpc = true
 # private_subnet_ids = ""
 # public_subnet_ids = ""
 
+tags = {
+  Environment = "dev"
+  Project     = "scwp"
+}

@@ -66,3 +66,7 @@ output "ssh_key" {
 output "terraform_state_bucket" {
   value = aws_s3_bucket.terraform_state.id
 }
+
+output "terraform_state_dynamodb" {
+    value = aws_dynamodb_table.terraform_locks.name
+}
