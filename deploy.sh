@@ -44,6 +44,15 @@ if [[ ! -e ${VAR_FILE} ]]; then
     exit 1
 fi
 
+# Check the variables file
+VAR_FILE="${ENV_PATH}/.secrets/secrets.tfvars"
+VAR_ARG+=" -var-file=${VAR_FILE}"
+
+if [[ ! -e ${VAR_FILE} ]]; then
+    echo "The secrets.tfvar file is not found in the env secret directory ${ENV_PATH}"
+    echo "Please check if the secrets are required for your deployment!"
+fi
+
 # Define the TF variable public IP address (var.my_ip)
  export TF_VAR_my_ip="$(curl checkip.amazonaws.com)/32"
 
@@ -62,4 +71,5 @@ terraform init ${BACKEND_CONFIG_ARG}
 
 # Terraform apply
 echo "Executing: terraform apply ${VAR_ARG}"
-terraform apply ${VAR_ARG}
+# terraform refresh
+terraform apply ${VAR_ARG} -target=module.efs

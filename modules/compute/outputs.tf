@@ -9,3 +9,7 @@ output "alb_sg" {
 output "instance_sg" {
   value = aws_security_group.instance.id
 }
+
+output "alb_domain" {
+  value = aws_alb.alb.dns_name
+}

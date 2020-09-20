@@ -53,3 +53,7 @@ variable "ssh_pub_key" {
 variable "userdata" {
   default = "#userdata"
 }
+
+variable "master_username" {}
+
+variable "master_password" {}

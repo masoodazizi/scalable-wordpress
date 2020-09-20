@@ -27,6 +27,14 @@ variable "userdata" {
   default = ""
 }
 
+variable "aurora_sg" {}
+
+variable "aurora_endpoint" {}
+
+variable "efs_sg" {}
+
+variable "efs_id" {}
+
 variable "create_bastion" {
   default = true
 }
@@ -50,7 +58,8 @@ variable "tags" {
 ##### AUTO SCALING GROUP VARIABLES
 
 variable "asg_min_size" {
-  default = "1"
+  default = "0"
+  # default = "1"
 }
 
 variable "asg_max_size" {
@@ -58,7 +67,8 @@ variable "asg_max_size" {
 }
 
 variable "asg_desired_capacity" {
-  default = "2"
+  default = "0"
+  # default = "2"
 }
 
 variable "asg_health_check_type" {
