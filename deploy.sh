@@ -44,6 +44,18 @@ if [[ ! -e ${VAR_FILE} ]]; then
     exit 1
 fi
 
+# Define the TF variable public IP address (var.my_ip)
+ export TF_VAR_my_ip="$(curl checkip.amazonaws.com)/32"
+
+# Define the TF variable ssh_pub_key
+PUB_KEY_FILE="${ENV_PATH}/.secrets/ssh-key.pub"
+if [[ -e ${PUB_KEY_FILE} ]]; then
+  export TF_VAR_ssh_pub_key=$(cat ${PUB_KEY_FILE})
+else
+  export TF_VAR_ssh_pub_key="Public Key not found."
+  echo "Public Key NOT found in the secret directory! Please execute the init script first, and then redeploy; otherwise ssh access to the instances are denied!"
+fi
+
 # Terraform init
 echo "Executing: terraform init ${BACKEND_CONFIG_ARG}"
 terraform init ${BACKEND_CONFIG_ARG}

@@ -1,5 +1,4 @@
-variable "env" {
-}
+variable "env" {}
 
 variable "cidr_block" {
   description = "Defines the CIDR for the whole VPC"
