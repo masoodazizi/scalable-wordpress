@@ -19,7 +19,7 @@ resource "random_string" "random_number" {
 }
 
 resource "aws_s3_bucket" "terraform_state" {
-  bucket = "${var.project_name}-terraform-remote-state-${random_string.random_number.result}"
+  bucket = "${var.env}-${var.project_name}-terraform-remote-state-${random_string.random_number.result}"
 
   versioning {
     enabled = true
@@ -36,7 +36,7 @@ resource "aws_s3_bucket" "terraform_state" {
 }
 
 resource "aws_dynamodb_table" "terraform_locks" {
-  name         = "${var.project_name}-terraform-state-locks"
+  name         = "${var.env}-${var.project_name}-terraform-state-locks"
   billing_mode = "PAY_PER_REQUEST"
   hash_key     = "LockID"
 
