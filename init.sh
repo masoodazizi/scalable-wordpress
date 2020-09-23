@@ -121,10 +121,12 @@ echo "The file 'variables.tfvars' was created in the path ${ENV_PATH}"
 fi
 
 # Create secret var file if not existing
+DB_USER="rds_admin"
+DB_PASS=$(cat /dev/urandom | env LC_CTYPE=C tr -dc 'a-zA-Z0-9' | fold -w 16 | head -n 1)
 SEC_PATH="${ENV_PATH}/.secrets"
 SEC_FILE="${SEC_PATH}/secrets.tfvars"
 if [[ ! -e ${SEC_FILE} ]]; then
-  SEC_PARAMS='master_username = "DB_USER"\nmaster_password = "DB_PASS"'
+  SEC_PARAMS="master_username = \"${DB_USER}\"\nmaster_password = \"${DB_PASS}\""
   mkdir -p ${SEC_PATH}
   echo -e ${SEC_PARAMS} > ${SEC_FILE}
 fi
