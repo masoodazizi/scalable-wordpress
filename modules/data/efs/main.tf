@@ -22,7 +22,7 @@ resource "aws_efs_mount_target" "efs" {
 
 resource "aws_security_group" "efs" {
   name   = "${var.env}-wp-efs-sg"
-  vpc_id = "${var.vpc_id}"
+  vpc_id = var.vpc_id
 
   tags = merge(
     var.tags,

@@ -8,7 +8,7 @@ variable "throughput_mode" {
 }
 
 variable "provisioned_mibps" {
-  default = 1
+  default = 0
 }
 
 variable "tags" {
