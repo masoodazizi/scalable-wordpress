@@ -24,7 +24,10 @@ resource "aws_rds_cluster" "aurora" {
 
   vpc_security_group_ids    = [aws_security_group.aurora.id]
   db_subnet_group_name      = aws_db_subnet_group.aurora.id
-  final_snapshot_identifier = "${var.env}-wp-db-final-snapshot"
+
+  # The final snapshot might be enabled for production. Disabled for simplicity.
+  # final_snapshot_identifier = "${var.env}-wp-db-final-snapshot"
+  skip_final_snapshot  = true
 
   backup_retention_period      = var.backup_retention_period
   preferred_backup_window      = var.preferred_backup_window
