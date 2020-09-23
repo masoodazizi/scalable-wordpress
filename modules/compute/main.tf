@@ -1,11 +1,11 @@
 resource "aws_launch_configuration" "lc" {
   key_name             = aws_key_pair.ssh_key.key_name
-  name_prefix          = "${var.env}-wp-instance"
+  name_prefix          = "${var.env}-wp-launch-configuration"
   image_id             = data.aws_ami.amazon-linux-2.id
   instance_type        = var.instance_type
   # iam_instance_profile = aws_iam_role.instance_role.name
   security_groups      = [aws_security_group.instance.id]
-  user_data            = var.userdata
+  user_data            = data.template_file.userdata.rendered
 
   root_block_device {
     volume_type = "gp2"
@@ -35,6 +35,21 @@ data "aws_ami" "amazon-linux-2" {
   }
 }
 
+data "template_file" "userdata" {
+  template = file("${path.module}/userdata.sh")
+
+  vars = {
+    wp_name = var.wp_name
+    wp_init = var.wp_init
+    wp_region = var.wp_region
+    wp_efs_id = var.wp_efs_id
+    wp_db_host = var.wp_db_host
+    wp_db_name = var.wp_db_name
+    wp_db_user = var.wp_init ? var.wp_db_user : ""
+    wp_db_password = var.wp_init ? var.wp_db_password : ""
+  }
+}
+
 resource "aws_autoscaling_group" "asg" {
   name                      = "${var.env}-wp-autoscaling-group"
   vpc_zone_identifier       = split(",", var.private_subnets)
@@ -42,10 +57,9 @@ resource "aws_autoscaling_group" "asg" {
   min_size                  = var.asg_min_size
   max_size                  = var.asg_max_size
   desired_capacity          = var.asg_desired_capacity
-  min_elb_capacity          = 1
   health_check_grace_period = var.asg_health_check_grace_period
   health_check_type         = var.asg_health_check_type
-
+  force_delete = true
   target_group_arns        = ["${aws_alb_target_group.tg.arn}"]
 
   tags = [
@@ -70,6 +84,10 @@ resource "aws_autoscaling_group" "asg" {
       propagate_at_launch = true
     }
   ]
+
+  lifecycle {
+    create_before_destroy = true
+  }
 }
 
 resource "aws_instance" "bastion" {

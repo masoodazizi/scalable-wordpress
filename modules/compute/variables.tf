@@ -23,17 +23,30 @@ variable "root_volume_size" {
   default = "10"
 }
 
-variable "userdata" {
-  default = ""
+variable "wp_name" {
+  default = "scwp"
 }
+
+variable "wp_init" {
+  default = false
+}
+
+variable "wp_region" {}
+
+variable "wp_efs_id" {}
+
+variable "wp_db_host" {}
+
+variable "wp_db_name" {}
+
+variable "wp_db_user" {}
+
+variable "wp_db_password" {}
 
 variable "aurora_sg" {}
 
-variable "aurora_endpoint" {}
-
 variable "efs_sg" {}
 
-variable "efs_id" {}
 
 variable "create_bastion" {
   default = true
@@ -58,8 +71,8 @@ variable "tags" {
 ##### AUTO SCALING GROUP VARIABLES
 
 variable "asg_min_size" {
-  default = "0"
-  # default = "1"
+  # default = "0"
+  default = "1"
 }
 
 variable "asg_max_size" {
@@ -67,8 +80,8 @@ variable "asg_max_size" {
 }
 
 variable "asg_desired_capacity" {
-  default = "0"
-  # default = "2"
+  #default = "0"
+  default = "2"
 }
 
 variable "asg_health_check_type" {
