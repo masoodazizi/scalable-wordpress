@@ -7,7 +7,7 @@ The environments can be for example:
  - test
  - prod
 
-** NOTE **
+**NOTE**
 
 The secret files such as ssh key and passwords are stored in the `.secrets` directory.
 The content must NOT be pushed to the remote repository!
