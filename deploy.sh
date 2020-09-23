@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-
+# set -x
 # Load the project variables into the current shell
 source ./project.vars
 PROJ_PATH=$(pwd)
@@ -82,16 +82,17 @@ fi
 
 # Terraform init
 echo "Executing: terraform init ${BACKEND_CONFIG_ARG}"
-terraform init ${BACKEND_CONFIG_ARG}
+terraform init -reconfigure ${BACKEND_CONFIG_ARG}
 
-# Select/create the workspace
-terraform workspace list | grep $ENV
-if [[ "${?}" -eq 0 ]]
-then
-    terraform workspace select $ENV
-else
-    terraform workspace new $ENV
-fi
+terraform workspace select default
+# Different backends exist, so no additional workspace needed.
+# terraform workspace list | grep $ENV
+# if [[ "${?}" -eq 0 ]]
+# then
+#     terraform workspace select $ENV
+# else
+#     terraform workspace new $ENV
+# fi
 
 
 if [[ $2 == 'tf' ]]; then
@@ -109,8 +110,9 @@ if [[ $2 == 'destroy' ]]; then
     then
         exit 1
     fi
-    echo "Executing: terraform destroy ${VAR_ARG} ${SEC_ARG} -target=module.efs"
+    echo "Executing: terraform destroy ${VAR_ARG} ${SEC_ARG}"
     terraform destroy ${VAR_ARG}
+    bash ./init.sh ${ENV} destroy
     exit 0
 fi
 
@@ -130,6 +132,7 @@ if [[ $2 == 'init' ]]; then
 fi
 
 # Terraform apply
-echo "Executing: terraform apply ${VAR_ARG} ${SEC_ARG} "
-# terraform refresh
+echo "Executing: terraform apply ${VAR_ARG} ${SEC_ARG}"
 terraform apply ${VAR_ARG} ${SEC_ARG}
+
+# END OF SCRIPT
