@@ -33,6 +33,10 @@ resource "aws_s3_bucket" "terraform_state" {
     }
   }
   depends_on = [random_string.random_number]
+
+  # !!! This variable enabled to ease the destroy process !!!
+  # !!!!!! In production MUST be disabled !!!!!!
+  force_destroy = true
 }
 
 resource "aws_dynamodb_table" "terraform_locks" {

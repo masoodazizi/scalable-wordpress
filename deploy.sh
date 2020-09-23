@@ -5,8 +5,8 @@ source ./project.vars
 PROJ_PATH=$(pwd)
 
 # Check the arguments
-if [[ ${#} -ne 1 ]]; then
-    echo "Please define a single argument as the ENVIRONMENT (e.g dev)!"
+if [[ ${#} -lt 1 ]]; then
+    echo "Please define minimum one argument as the ENVIRONMENT name (e.g dev)!"
     echo "Initialization aborted."
     exit 1
 fi
@@ -14,6 +14,13 @@ fi
 # Check the environment (dev,...,prod)
 ENV=$1
 ENV_PATH="${PROJ_PATH}/environments/${ENV}"
+
+# Automatically execute the init.sh script, if the ARG 'init' specified.
+if [[ $2 == 'init' ]]; then
+  echo "Executing the init.sh script: ./init.sh ${ENV}"
+  bash ./init.sh ${ENV}
+  echo "If the default variables are required to be changed, you can update them and redeploy the modules."
+fi
 
 if [[ ! -d ${ENV_PATH} ]]; then
     echo "The environment '${ENV}' does NOT exist under 'environments' directory."
@@ -44,14 +51,10 @@ if [[ ! -e ${VAR_FILE} ]]; then
     exit 1
 fi
 
-# Check the variables file
-VAR_FILE="${ENV_PATH}/.secrets/secrets.tfvars"
-VAR_ARG+=" -var-file=${VAR_FILE}"
 
-if [[ ! -e ${VAR_FILE} ]]; then
-    echo "The secrets.tfvar file is not found in the env secret directory ${ENV_PATH}"
-    echo "Please check if the secrets are required for your deployment!"
-fi
+# Define terraform variables
+export TF_VAR_region=${AWS_REGION}
+export TF_VAR_project=${PROJECT}
 
 # Define the TF variable public IP address (var.my_ip)
  export TF_VAR_my_ip="$(curl checkip.amazonaws.com)/32"
@@ -65,11 +68,68 @@ else
   echo "Public Key NOT found in the secret directory! Please execute the init script first, and then redeploy; otherwise ssh access to the instances are denied!"
 fi
 
+# Check the secret variables file
+SEC_FILE="${ENV_PATH}/.secrets/secrets.tfvars"
+SEC_ARG=" -var-file=${SEC_FILE}"
+
+if [[ ! -e ${SEC_FILE} ]]; then
+    echo "The secrets.tfvar file is not found in the env secret directory ${ENV_PATH}"
+    echo "Secret parameters such as DB user and pass are required for the deployment."
+    echo "Please provide the required variables in ${SEC_FILE}"
+    echo "The script is now aborted!"
+    exit 1
+fi
+
 # Terraform init
 echo "Executing: terraform init ${BACKEND_CONFIG_ARG}"
 terraform init ${BACKEND_CONFIG_ARG}
 
+# Select/create the workspace
+terraform workspace list | grep $ENV
+if [[ "${?}" -eq 0 ]]
+then
+    terraform workspace select $ENV
+else
+    terraform workspace new $ENV
+fi
+
+
+if [[ $2 == 'tf' ]]; then
+  echo "terraform ${@:3} ${VAR_ARG} ${SEC_ARG}"
+  terraform ${@:3} ${VAR_ARG} ${SEC_ARG}
+  exit 0
+fi
+
+# Destroy if the arg was defined
+if [[ $2 == 'destroy' ]]; then
+    echo "The script was executed with DESTROY flag!"
+    read -p "Do you really want to destroy all resources of ${ENV} environment? [Y/y]" -n 1 -r
+    echo
+    if [[ ! $REPLY =~ ^[Yy]$ ]]
+    then
+        exit 1
+    fi
+    echo "Executing: terraform destroy ${VAR_ARG} ${SEC_ARG} -target=module.efs"
+    terraform destroy ${VAR_ARG}
+    exit 0
+fi
+
+# Run the initiate deploy if specified
+if [[ $2 == 'init' ]]; then
+  echo "Performing initiate deploy..."
+
+  # Define init specific variables
+  INIT_ARG=' -var=wp_init=true -var=desired_capacity=1'
+
+  echo "Executing: terraform apply -target=module.network ${VAR_ARG} ${SEC_ARG} ${INIT_ARG}"
+  terraform apply -target=module.network  ${VAR_ARG} ${SEC_ARG} ${INIT_ARG}
+
+  echo "Executing: terraform apply ${VAR_ARG} ${SEC_ARG} ${INIT_ARG}"
+  terraform apply ${VAR_ARG} ${SEC_ARG} ${INIT_ARG}
+
+fi
+
 # Terraform apply
-echo "Executing: terraform apply ${VAR_ARG}"
+echo "Executing: terraform apply ${VAR_ARG} ${SEC_ARG} "
 # terraform refresh
-terraform apply ${VAR_ARG} -target=module.efs
+terraform apply ${VAR_ARG} ${SEC_ARG}
