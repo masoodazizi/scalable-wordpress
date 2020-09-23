@@ -3,7 +3,11 @@ variable "env" {
 }
 
 variable "region" {
-  default = ""
+  default = "eu-central-1"
+}
+
+variable "project" {
+  default = "scwp"
 }
 
 variable "create_vpc" {
@@ -50,10 +54,22 @@ variable "ssh_pub_key" {
   default = ""
 }
 
-variable "userdata" {
-  default = "#userdata"
+variable "master_username" {
+  default = ""
 }
 
-variable "master_username" {}
+variable "master_password" {
+  default = ""
+}
 
-variable "master_password" {}
+variable "database_name" {
+  default = "wordpress"
+}
+
+variable "desired_capacity" {
+  default = 2
+}
+
+variable "wp_init" {
+  default = false
+}
