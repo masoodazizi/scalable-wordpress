@@ -6,6 +6,7 @@ This project will provision all required resources in AWS environment and adjust
 
 ### Prerequisits
 
+#### AWS Account
 All the procedures and steps are automated via IaC and scripting. So the only requirement is an AWS profile with sufficient permission for all required resouces. If you are not familiar with AWS policies and permissions, you can temporarily grant the user Administrator Access or Power User permissions.
 
 Therefore, when you have configured your AWS profile in your terminal via the Access Key and the Secret Key, you are ready to execute the deployment.
@@ -15,9 +16,13 @@ You can check the user that you have defined in the AWS profile configuration wi
 ```shell
 aws iam get-user --profile AWS_PROFILE
 ```
+#### Operating System
+This project was tested on MacOS Catalina and theoretically should work in all *nix environments. 
 
-This project was tested on MacOS Catalina and theoretically should work in all *nix environments. The scripts are written with Bash command language and require Bash intrepretor to execute the job, as it is defined in the beginnig of the scriot files that by which program the script should be run.
+#### Interpretor
+The scripts are written with Bash command language and require Bash intrepretor to execute the job, as it is defined in the beginnig of the scriot files that by which program the script should be run.
 
+#### IaC Language
 The skeleton of the project is Terraform. All the resources and automations were implemented by Terraform as the IaC. The project was tested with Terraform version `0.13.3` as it is defined in the [.terraform-version](.terraform-version) file. Some new features of TF 0.13 are applied in the code, so it would not work with the versions below 0.13 on the fly. Some adjusment is needed in the code to be able to run it with TF 0.12. However, the syntax is not compatible with the Terraform versions below 0.12.
 
 ### Parameters
